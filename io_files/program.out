@@ -1,0 +1,29 @@
+0755:  LSL r5, r2, #29
+0A5B:  LSR r3, r3, #9
+12CB:  ASR r3, r1, #11
+18AD:  ADD r5, r5, r2
+1A5B:  SUB r3, r3, r1
+1CDD:  ADD r5, r3, #3
+1EBB:  SUB r3, r7, #2
+26DF:  MOV r6, #223
+2BF9:  CMP r3, #249
+31DA:  ADD r1, #218
+3AE8:  SUB r2, #232
+516F:  LDR r7, r5, r5
+53B4:  LDRH r4, r6, r6
+5527:  LDRB r7, r4, r4
+57AD:  LDRSH r5, r5, r6
+596F:  STR r7, r5, r5
+5B51:  STRH r1, r2, r5
+5C6D:  STRB r5, r5, r1
+5FB7:  LDRSB r7, r6, r6
+6154:  STR r4, [r2, #20]
+6B57:  LDR r7, [r2, #52]
+731A:  STRB r2, [r3, #12]
+7AD1:  LDRB r1, [r2, #11]
+82FB:  STRH r3, [r7, #22]
+83AB:  STRH r3, [r5, #28]
+9366:  STR r3, [sp, #408]
+9BFF:  LDR r3, [sp, #1020]
+A5ED:  ADD r5, pc, #948
+AD6E:  ADD r5, sp, #440
