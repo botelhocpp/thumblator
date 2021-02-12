@@ -78,8 +78,8 @@ string decodeInstructions(int numeric_opcode, int line_number){
                 break;
         }
         opcode += " r" + to_string(numeric_opcode & 0x7) 
-               + ", r" + to_string((numeric_opcode >> 3) & 0x7) 
-               + ", r" + to_string((numeric_opcode >> 6) & 0x7);
+               + ", [r" + to_string((numeric_opcode >> 3) & 0x7) 
+               + ", r" + to_string((numeric_opcode >> 6) & 0x7) + "]";
         break;
 
     case 0x6:
