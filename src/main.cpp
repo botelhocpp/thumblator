@@ -36,9 +36,9 @@ int main(int argc, char* argv[]){
 
     while (source_code.find(' ') != source_code.npos)
         source_code.erase(source_code.find(' '), 1);
-
+        
     while (step < source_code.size()){
-        while (source_code[step] != '\n' || step == source_code.size())
+        while (source_code[step] != '\n' && step != source_code.size())
             opcode += source_code[step++];
         numeric_opcode = strtol(opcode.c_str(), NULL, 16);
         opcode = decodeInstructions(numeric_opcode, ++line_number);
