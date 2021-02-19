@@ -1,5 +1,4 @@
 #include "thumblator.hpp"
-#include "cmath"
 
 string stringHex(int number){
 	string hex_string = "0000";
@@ -121,7 +120,7 @@ string decodeInstructions(int numeric_opcode, int line_number){
         switch ((numeric_opcode >> 9) & 0x3){
             case 0x0:
                 opcode = ((numeric_opcode >> 7) & 0x1) ? "SUB " : "ADD ";
-                opcode += "pc, #" + to_string((numeric_opcode & 0x7F) * 4);
+                opcode += "sp, #" + to_string((numeric_opcode & 0x7F) * 4);
                 break;
             case 0x1:
                 switch((numeric_opcode >> 6) & 0x23){
@@ -156,17 +155,13 @@ string decodeInstructions(int numeric_opcode, int line_number){
 
             case 0x2:
                 opcode = ((numeric_opcode >> 11) & 0x1) ? "POP{" : "PUSH{";
-                for(int loop = 0; loop < 8; loop++){
-                    if(numeric_opcode & 1) opcode += "r" + to_string(loop) + ", "; 
-                    numeric_opcode >>= 1;
-                }
+                for(int loop = 0; loop < 8; loop++)
+                    if((numeric_opcode >> loop) & 1) opcode += "r" + to_string(loop) + ", ";
                 opcode.erase(opcode.size() - 2, 2);
-                if((numeric_opcode >> 8) & 0x1){
+                if((numeric_opcode >> 8) & 0x1)
                     opcode += ((numeric_opcode >> 11) & 0x1) ? ", pc}" : ", lr}";
-                }
-                else{
+                else
                     opcode += ((numeric_opcode >> 11) & 0x1) ? "}" : "}";
-                }
                 break;
 
             case 0x3:
@@ -195,96 +190,3 @@ string decodeInstructions(int numeric_opcode, int line_number){
     }
     return opcode;
 }
-
-/*
-1011 X10R YYYY YYYY
-
-PUSH
-1011 0100 0101 0101 PUSH{r0,r2,r4,r6} 
-1011 0101 1111 1111 PUSH{r0-r7,lr}    
-
-POP
-1011 1100 0101 0101 POP{r0,r2,r4,r6} 
-1011 1101 1111 1111 POP{r0-r7,pc}
-
-00000111
-00001111
-00011111
-00111111
-01111111
-11111111
-11111110
-11111100
-11111000
-11110000
-11100000
-
-
-                
-                bool f;
-                f = false;
-                opcode = ((numeric_opcode >> 11) & 0x1) ? "POP{" : "PUSH{";
-                if((numeric_opcode >> 11) & 0x1) f = true;
-                short itb;
-                itb = 0;
-                while(itb < 8){
-                    if(((numeric_opcode >> itb) & 0x1)){
-                        opcode += "r" + to_string(itb) + ", "; 
-                    }
-                    itb++;
-                }        
-                opcode.erase(opcode.size() - 2, 2); 
-                if((numeric_opcode >> 8) & 0x1) f ? opcode += ", pc" : opcode += ", lr";
-                opcode += "}";
-                break; 
-                
-
-
-int minRegister(int number){
-    int step = 0;
-    while(!(number & 1)){
-        number >>= 1;
-        step++;
-    }
-    return step;
-}
-
-int maxRegister(int number){
-    int step = 7;
-    while(!(number & 0x80)){
-        number <<= 1;
-        step--;
-    }
-    return step;
-}
-00000111
-00001111
-00011111
-00111111
-01111111
-11111111
-11111110
-11111100
-11111000
-11110000
-11100000
-
-string registerList(int number){
-    string list_of_registers;
-    short counter = 0;
-    short minRegister = 0;
-    short maxRegister = 0;
-    for(int step = 0; step < 8; step++){
-        
-    }
-    if(counter > 2)
-        list_of_registers = "r" + to_string(minRegister) + "-r" + to_string(maxRegister);
-    for(int loop = 0; loop < 8; loop++){
-        if(number & 1) list_of_registers += "r" + to_string(loop) + ", "; 
-        number >>= 1;
-    }
-    return list_of_registers.erase(list_of_registers.size() - 2, 2);
-    //return list_of_registers;
-}
-*/
-
