@@ -36,7 +36,7 @@ int main(int argc, char* argv[]){
 
     while (source_code.find(' ') != source_code.npos)
         source_code.erase(source_code.find(' '), 1);
-        
+
     while (step < source_code.size()){
         while (source_code[step] != '\n' && step != source_code.size())
             opcode += source_code[step++];
@@ -48,6 +48,7 @@ int main(int argc, char* argv[]){
         opcode.clear();
     }
 
+    source_code.erase(source_code.size() - 1, 1);
     ofstream output_file;
     if (argc == 2)
         output_file.open(input_file_name.replace(input_file_name.find(".in"), 3, ".out"));
