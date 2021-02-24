@@ -1,9 +1,11 @@
-#ifndef THUMBLATOR_HPP
-#define THUMBLATOR_HPP
+#ifndef THUMBLATOR_H
+#define THUMBLATOR_H
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <string>
+#include <cmath>
 
 using namespace std;
 
