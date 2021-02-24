@@ -207,7 +207,7 @@ string decodeInstructions(int numeric_opcode, int line_number){
                 }
                 opcode.erase(opcode.size() - 2, 2);
                 if((numeric_opcode >> 8) & 0x1){//Condicional defeituoso
-                    ((numeric_opcode >> 11) & 0x1) ? opcode += ", pc" : opcode += ", lr";
+                    opcode += ((numeric_opcode >> 11) & 0x1) ? ", pc" : ", lr";
                 }
                 opcode += "}";
                 break;
@@ -268,7 +268,9 @@ string decodeInstructions(int numeric_opcode, int line_number){
             }
             opcode += " #" + to_string((numeric_opcode & 0xFF)*2 + 4);
         }else if(((numeric_opcode >> 8) & 0xf) == 0xe){
-            opcode = "Undefined and expected to remain so: " + to_string((numeric_opcode & 0xff));
+            cout << "\033[1;37mThumblator:\033[0m \033[1;31mFatal error\033[0m: invalid instruction " << stringHex(numeric_opcode) << " at line " << line_number << ".\nAborting.\n";
+            opcode.clear();
+            return opcode;
         }else{
             opcode = "SWI #" + to_string((numeric_opcode & 0xff));
         }
