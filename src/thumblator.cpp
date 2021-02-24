@@ -1,4 +1,7 @@
-#include "thumblator.hpp"
+#include "thumblator.h"
+//Variáveis usadas nos cases 0xe e 0xf.
+bool poff_access = false;
+short poff;
 
 string stringHex(int number){
 	string hex_string = "0000";
@@ -48,6 +51,49 @@ string decodeInstructions(int numeric_opcode, int line_number){
         opcode = ((numeric_opcode >> 11) & 0x1) ? "SUB" : "ADD";
         opcode += " r" + to_string((numeric_opcode >> 8) & 0x7) 
                + ", #" + to_string(numeric_opcode & 0xFF);
+        break;
+
+    case 0x4:
+        if(((numeric_opcode >> 11) & 0x1)){
+            opcode = "LDR r" + to_string((numeric_opcode >> 8) & 0x3)
+                   + ", [pc, #" + to_string((numeric_opcode & 0xFF)*4) + "]";
+        }else{
+            if(((numeric_opcode >> 9) & 0x1)){
+                opcode = ((numeric_opcode >> 7) & 0x1) ? "BLX " : "BL ";
+                opcode += to_string(((numeric_opcode >> 3) & 0xF));
+            }else{
+                if(((numeric_opcode >> 8) & 0x1)){
+                    opcode = "CMP ";
+                    switch(((numeric_opcode >> 6) & 0x3)){
+                        case 0x1:
+                            opcode += "r" + to_string(((numeric_opcode >> 3) & 0x7) & 0x7)
+                                   + ", r" + to_string((numeric_opcode & 0x7));
+                            break;
+                        case 0x2:
+                            opcode += "r" + to_string(((numeric_opcode >> 3) & 0x7))
+                                   + ", r" + to_string((numeric_opcode & 0x7) & 0x7);
+                            break;
+                        case 0x3:
+                            opcode += "r" + to_string(((numeric_opcode >> 3) & 0x7) & 0x7)
+                                   + ", r" + to_string((numeric_opcode & 0x7) & 0x7);
+                            break;
+                    }
+                }else{
+                    opcode += ((numeric_opcode >> 9) & 0x1) ? "MOV r" : "ADD r";
+                    switch(((numeric_opcode >> 6) & 0x3)){
+                        case 0x2:
+                            opcode += to_string((numeric_opcode & 0x7) & 0x7) + ", r"
+                                   + to_string(((numeric_opcode >> 3) & 0x7));
+                            break;
+                        case 0x3:
+                            opcode += to_string((numeric_opcode & 0x7) & 0x7) + ", r"
+                                   + to_string(((numeric_opcode >> 3) & 0x7) & 0x7);
+                            break;
+                    }
+                }
+            }
+        }
+
         break;
 
     case 0x5:
@@ -120,7 +166,7 @@ string decodeInstructions(int numeric_opcode, int line_number){
         switch ((numeric_opcode >> 9) & 0x3){
             case 0x0:
                 opcode = ((numeric_opcode >> 7) & 0x1) ? "SUB " : "ADD ";
-                opcode += "sp, #" + to_string((numeric_opcode & 0x7F) * 4);
+                opcode += "pc, #" + to_string((numeric_opcode & 0x7F) * 4);
                 break;
             case 0x1:
                 switch((numeric_opcode >> 6) & 0x23){
@@ -155,13 +201,15 @@ string decodeInstructions(int numeric_opcode, int line_number){
 
             case 0x2:
                 opcode = ((numeric_opcode >> 11) & 0x1) ? "POP{" : "PUSH{";
-                for(int loop = 0; loop < 8; loop++)
-                    if((numeric_opcode >> loop) & 1) opcode += "r" + to_string(loop) + ", ";
+                for(int loop = 0; loop < 8; loop++){
+                    if(numeric_opcode & 1) opcode += "r" + to_string(loop) + ", "; 
+                    numeric_opcode >>= 1;
+                }
                 opcode.erase(opcode.size() - 2, 2);
-                if((numeric_opcode >> 8) & 0x1)
-                    opcode += ((numeric_opcode >> 11) & 0x1) ? ", pc}" : ", lr}";
-                else
-                    opcode += ((numeric_opcode >> 11) & 0x1) ? "}" : "}";
+                if((numeric_opcode >> 8) & 0x1){//Condicional defeituoso
+                    ((numeric_opcode >> 11) & 0x1) ? opcode += ", pc" : opcode += ", lr";
+                }
+                opcode += "}";
                 break;
 
             case 0x3:
@@ -180,6 +228,87 @@ string decodeInstructions(int numeric_opcode, int line_number){
                     }
                 }
                 break;
+        }
+        break;
+    
+    case 0xd:
+        if(((numeric_opcode >> 8) & 0xF) < 0xe){
+            opcode = "B";
+            switch(((numeric_opcode >> 8) & 0xf)){
+                case 0x0: opcode += "EQ";
+                    break;
+                case 0x1: opcode += "NE";
+                    break;
+                case 0x2: opcode += "CS/HS";
+                    break;
+                case 0x3: opcode += "CC/LO";
+                    break;
+                case 0x4: opcode += "MI";
+                    break;
+                case 0x5: opcode += "PL";
+                    break;
+                case 0x6: opcode += "VS";
+                    break;
+                case 0x7: opcode += "VC";
+                    break;
+                case 0x8: opcode += "HI";
+                    break;
+                case 0x9: opcode += "LS";
+                    break;
+                case 0xa: opcode += "GE";
+                    break;
+                case 0xb: opcode += "LT";
+                    break;
+                case 0xc: opcode += "GT";
+                    break;
+                case 0xd: opcode += "LE";
+                    break;
+                case 0xe: opcode += "{AL}";
+                    break;
+            }
+            opcode += " #" + to_string((numeric_opcode & 0xFF)*2 + 4);
+        }else if(((numeric_opcode >> 8) & 0xf) == 0xe){
+            opcode = "Undefined and expected to remain so: " + to_string((numeric_opcode & 0xff));
+        }else{
+            opcode = "SWI #" + to_string((numeric_opcode & 0xff));
+        }
+        break;
+    //Daqui pra baixo: código defeituoso
+    case 0xe:
+        if(((numeric_opcode >> 11) & 0x1)){
+            if(poff_access){
+                opcode = "BLX #" + to_string(((numeric_opcode & 0x7FE)*4 + 4 + (poff<<12)) &~ 3); 
+            }else{
+                cout << "\033[1;37mThumblator:\033[0m \033[1;31mFatal error\033[0m: prefix offset not found\n";
+            }
+        }else{
+            short address = numeric_opcode & 0x3FF;
+            if((numeric_opcode >> 10) & 0x1){
+                if(address == 0){
+                    address = numeric_opcode & 0x7FF;
+                }
+                address *= -1;
+            }
+            opcode = "B #" + to_string(address*2 + 4);
+        }
+        break;
+
+    case 0xf:
+        if(((numeric_opcode >> 11) & 0x1)){
+            if(poff_access){
+                opcode = "BL #" + to_string((numeric_opcode & 0x7FF)*2 + 4 + (poff<<12));
+            }else{
+                cout << "\033[1;37mThumblator:\033[0m \033[1;31mFatal error\033[0m: prefix offset not found\n";
+            }
+        }else{
+            poff = numeric_opcode & 0x3FF;
+            if((numeric_opcode >> 10) & 0x1){
+                if(poff == 0){
+                    poff = numeric_opcode & 0x7FF;
+                }
+                poff *= -1;
+            }
+            poff_access = true;
         }
         break;
 
