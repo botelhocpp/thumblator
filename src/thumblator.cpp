@@ -1,4 +1,4 @@
-#include "thumblator.h"
+#include "thumblator.hpp"
 //Variáveis usadas nos cases 0xe e 0xf.
 bool poff_access;
 short poff;
