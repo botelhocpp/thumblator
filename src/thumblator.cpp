@@ -21,7 +21,7 @@ string stringHex(int number){
 		number /= 0x10;
 	}
 	return hex_string;
-}
+} 
 
 //DECODE THE INSTRUCTION IN NUMERIC_OPCODE
 //EACH CASE REPRESENT AN INDEX, THE 4 MSB IN NUMERIC_OPCODE
