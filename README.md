@@ -1,8 +1,8 @@
 # Thumblator
 A Thumb Instruction Set Opcode Translator
 
-# COMPILING
+# Compiling
 make all
 
-# RUNNING
+# Running
 ./bin/thumblator <input>.in <output[optional]>
