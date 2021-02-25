@@ -1,12 +1,16 @@
 #include "thumblator.h"
-//Variáveis usadas nos cases 0xe e 0xf.
+
+//USED IN CASES 0xE AND 0xF.
 bool poff_access;
 short poff;
-//Usada nas instrucoes push/pop(case 0xb) e stmia/ldmia(case 0xc)
+
+//USED IN PUSH/POP INSTRUCTIONS (CASE 0xB) AND STMIA/LDMIA INSTRUCTIONS (CASE 0xC)
 bool reg_fl;
-//Usada no case 0x4
+
+//USED IN CASE 0x4
 bool def_fl;
 
+//RETURNS A STRING IN HEX FORMAT FROM A NUMBER
 string stringHex(int number){
 	string hex_string = "0000";
 	int step = 3;
@@ -19,6 +23,8 @@ string stringHex(int number){
 	return hex_string;
 }
 
+//DECODE THE INSTRUCTION IN NUMERIC_OPCODE
+//EACH CASE REPRESENT AN INDEX, THE 4 MSB IN NUMERIC_OPCODE
 string decodeInstructions(int numeric_opcode, int line_number){
     string opcode;
     switch((numeric_opcode >> 12) & 0xf){
